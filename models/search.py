@@ -90,10 +90,10 @@ def beam_search(model, smiVoc, num_beams, batch_size, max_length, topk, batch, b
         edge_feature=compose_knn_edge_feature,
         idx_protein=idx_protein,
     )
-    protein_encoder_outputs = model.frontier_pred(h_compose, idx_protein)
-    protein_embed_transformed = model.projection3(protein_encoder_outputs)
-
-    ret_mol_embed_transformed = model.projection2(batch_ret_embeddings)
+    protein_embed_transformed = model.frontier_pred(h_compose, idx_protein)
+    # protein_embed_transformed = model.projection3(protein_encoder_outputs)
+    #
+    # ret_mol_embed_transformed = model.projection2(batch_ret_embeddings)
 
     # merge retmol features
 
@@ -110,11 +110,12 @@ def beam_search(model, smiVoc, num_beams, batch_size, max_length, topk, batch, b
     # fusion module
     #for layer in model.cross_encoder:
     #    encoder_out, atten = layer(ret_mol_embed_transformed, ret_mol_embed_transformed, encoder_out)
-    encoder_out = model.cross_encoder(encoder_out, ret_mol_embed_transformed)
+    # encoder_out = model.cross_encoder(encoder_out, ret_mol_embed_transformed)
     encoder_out =encoder_out.repeat_interleave(num_beams,0)
 
     while cur_len < max_length:
         decoder_outputs = model.decoder(input_ids, encoder_out, cur_len, prop, device)
+        # decoder_outputs = model.decoder(input_ids, encoder_out, cur_len, prop)
         dec_logits = model.projection(decoder_outputs)
 
         next_token_logits = dec_logits[:, -1, :]
